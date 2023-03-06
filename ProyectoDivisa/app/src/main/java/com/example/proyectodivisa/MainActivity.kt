@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val workRequest = PeriodicWorkRequestBuilder<MyWorker>(
-            15, // Intervalo mínimo de tiempo en minutos
-            TimeUnit.MINUTES
+            8, // Intervalo mínimo de tiempo en minutos
+            TimeUnit.HOURS
             )
             .setConstraints(constraints)
             .build()
