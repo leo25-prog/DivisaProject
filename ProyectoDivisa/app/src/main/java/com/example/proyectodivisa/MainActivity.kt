@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         myJsonTxt = findViewById(R.id.jsonText)
-        getPosts()
 
         // EJECUTA EL WORKMANAGER PERIODICAMENTE
         val workManager = WorkManager.getInstance(applicationContext)
@@ -40,53 +39,19 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val workRequest = PeriodicWorkRequestBuilder<MyWorker>(
-            8, // Intervalo mínimo de tiempo en minutos
+            24, // Intervalo mínimo de tiempo en minutos
             TimeUnit.HOURS
             )
             .setConstraints(constraints)
             .build()
 
         workManager.enqueue(workRequest)
+
+        val applicationScope = CoroutineScope(SupervisorJob())
+        val lista = MonedaDatabase.getDatabase(applicationContext, applicationScope).MonedaDao().getAllLista()
+
+        for(list in lista){
+            myJsonTxt.append(list.code + " -> " + list.value + "\n")
+        }
     }
-
-    private fun getPosts(){
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://v6.exchangerate-api.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        var api : ExchangerateAPI = retrofit.create(ExchangerateAPI::class.java)
-
-        var call : Call<Posts> = api.posts
-
-        call.enqueue(object : Callback<Posts> {
-            override fun onResponse(call: Call<Posts>, response: Response<Posts>) {
-                if(!response.isSuccessful) {
-                    myJsonTxt.setText("Codigo: " + response.code())
-                    return
-                }
-
-                var post = response.body()
-
-                val applicationScope = CoroutineScope(SupervisorJob())
-                var moneda = Moneda(
-                    _id = 0,
-                    code = "",
-                    value = 0.0
-                )
-                post!!.conversion_ratesonversions.forEach { codes ->
-                    moneda.code = codes.key
-                    moneda.value = codes.value
-                    myJsonTxt.append(moneda.code + "  " + moneda.value.toString() + "\n")
-                    MonedaDatabase.getDatabase(applicationContext, applicationScope).MonedaDao().insert(moneda)
-                }
-            }
-
-            override fun onFailure(call: Call<Posts>, t: Throwable) {
-                myJsonTxt.setText(t.message)
-            }
-        })
-
-    }
-
 }

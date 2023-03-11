@@ -19,11 +19,17 @@ interface MonedaDao {
     @Query("SELECT * FROM Moneda WHERE code = :code")
     fun getByCode(code: String) : Moneda
 
+    @Query("SELECT * FROM Moneda WHERE code = :code")
+    fun getByCodeCursor(code: String): Cursor
+
     @Query("select * from Moneda")
     fun getAllCursor(): Cursor
 
     @Query("select * from Moneda")
     fun getAll(): kotlinx.coroutines.flow.Flow<List<Moneda>>
+
+    @Query("SELECT * FROM Moneda")
+    fun getAllLista(): List<Moneda>
 
     @Query ("delete from Moneda")
     fun deleteAll()

@@ -1,14 +1,11 @@
 package com.example.proyectodivisa.WorkManager
 
 import android.content.Context
-import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.proyectodivisa.Database.Moneda
-import com.example.proyectodivisa.Database.MonedaDao
 import com.example.proyectodivisa.Database.MonedaDatabase
 import com.example.proyectodivisa.Interface.ExchangerateAPI
-import com.example.proyectodivisa.MainActivity
 import com.example.proyectodivisa.Model.Posts
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -20,10 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     val applicationScope = CoroutineScope(SupervisorJob())
-
     override fun doWork(): Result {
-        MonedaDatabase.getDatabase(applicationContext, applicationScope).MonedaDao().deleteAll()
-
         val retrofit = Retrofit.Builder()
             .baseUrl("https://v6.exchangerate-api.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -31,7 +25,7 @@ class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(contex
 
         var api : ExchangerateAPI = retrofit.create(ExchangerateAPI::class.java)
 
-        var call : Call<Posts> = api.posts
+        var call : Call<Posts> = api.getPosts("v6/064e537b97fd03303fa8e8ae/latest/USD")
 
         call.enqueue(object : Callback<Posts> {
             override fun onResponse(call: Call<Posts>, response: Response<Posts>) {
@@ -45,11 +39,16 @@ class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(contex
                 var moneda = Moneda(
                     _id = 0,
                     code = "",
+                    update = "",
+                    base_code = "",
                     value = 0.0
                 )
                 for(codes in post!!.conversion_ratesonversions){
                     moneda.code = codes.key
                     moneda.value = codes.value
+                    moneda.base_code = post.base_code
+                    moneda.update = post.time_last_update_utc
+
                     MonedaDatabase.getDatabase(applicationContext, applicationScope).MonedaDao().insert(moneda)
                 }
             }
@@ -57,8 +56,6 @@ class MyWorker(context: Context, workerParams: WorkerParameters) : Worker(contex
             override fun onFailure(call: Call<Posts>, t: Throwable) {
             }
         })
-        Log.d("this_app", "Si que, jala")
-
         return Result.success()
     }
 }

@@ -2,19 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- PERMISOS NECESARIOS PARA LA APLICACION -->
-    <!-- PERMISO DE INTERNET -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <queries>
+        <provider android:authorities="com.example.proyectodivisa" />
+    </queries>
 
     <application
-        android:name=".Repository.Myapplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ProyectoDivisa"
+        android:theme="@style/Theme.ClienteDivisa"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -29,13 +28,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
-        <provider
-            android:authorities="com.example.proyectodivisa"
-            android:name=".Content.MyContentProvider"
-            android:enabled="true"
-            android:exported="true"
-            />
     </application>
 
 </manifest>

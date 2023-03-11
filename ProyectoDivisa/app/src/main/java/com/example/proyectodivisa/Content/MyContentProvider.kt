@@ -10,11 +10,8 @@ import com.example.proyectodivisa.Repository.MonedaRepository
 import com.example.proyectodivisa.Repository.Myapplication
 
 private val sUriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
-
     addURI("com.example.proyectodivisa", "monedas", 1)
-
     addURI("com.example.proyectodivisa", "monedas/#", 2)
-
     addURI("com.example.proyectodivisa", "monedas/*", 3)
 }
 
@@ -23,7 +20,6 @@ class MyContentProvider : ContentProvider() {
     lateinit var repository: MonedaRepository
     lateinit var db: MonedaDatabase
     override fun onCreate(): Boolean {
-        //TODO("Not yet implemented")
         repository =  (context as Myapplication).repositoryMoneda
         db =  (context as Myapplication).database
         return true
@@ -36,29 +32,16 @@ class MyContentProvider : ContentProvider() {
         p3: Array<out String>?,
         p4: String?
     ): Cursor? {
-        //TODO("Not yet implemented")
         var cursor: Cursor? = null
 
         when( sUriMatcher.match(p0)){
-            //"content://com.example.proyectodivisa/monedas"
-            //query / insert
             1 -> {
                 cursor = db.MonedaDao().getAllCursor()
 
             }
-            //"content://com.example.proyectodivisa/monedas/*"
-            //query
-            2 -> {
-
-            }
-            //"content://com.example.proyectodivisa/monedas/#"
-            //query / update  /  delete
-            3 -> {
-
-            }
-            else -> {
-
-            }
+            2 -> { }
+            3 -> { }
+            else -> { }
         }
         return cursor
     }
